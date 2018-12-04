@@ -5,10 +5,10 @@
 * CRF -- yiyunzhao; baseline, flattened structure and FFNN
 
 # Writing
-YY -- baseline,  description of flattening & FFNN, CRF
-SJP -- conclusion, description of CNN, 
-MA -- introduction, description of SVM,
-JC -- previous research, description of BiLSTM, final editing
+* YY -- baseline,  description of flattening & FFNN, CRF
+* SJP -- conclusion, description of CNN, 
+* MA -- introduction, description of SVM,
+* JC -- previous research, description of BiLSTM, final editing
 
 # Contents
 
