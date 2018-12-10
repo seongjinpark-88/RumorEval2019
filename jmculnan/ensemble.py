@@ -9,10 +9,10 @@ import pickle
 #take relevant files
 x_testpath     = 'saved_dataRumEval2019_npy_files/dev/train_array.npy'
 y_testpath     = 'saved_dataRumEval2019_npy_files/dev/fold_stance_labels.npy'
-flatx_testpath = 'saved_dataRumEval2019_npy_files/dev/flat_dev_x.npy'
-flaty_testpath = 'saved_dataRumEval2019_npy_files/dev/flat_dev_y.npy'
-otherx_testpath= 'saved_dataRumEval2019_npy_files/dev/dev_x_preceding_thread.npy'
-othery_testpath= 'saved_dataRumEval2019_npy_files/dev/dev_y_preceding_thread.npy'
+flatx_testpath = 'saved_dataRumEval2019_npy_files/dev/flat_dev_x.npy' #yiyun zhao
+flaty_testpath = 'saved_dataRumEval2019_npy_files/dev/flat_dev_y.npy' #yiyun zhao
+otherx_testpath= 'saved_dataRumEval2019_npy_files/dev/dev_x_preceding_thread.npy' #masha alexeeva
+othery_testpath= 'saved_dataRumEval2019_npy_files/dev/dev_y_preceding_thread.npy' #masha alexeeva
 tweet_idspath  = 'saved_dataRumEval2019_npy_files/dev/tweet_ids.npy'
 
 #load relevant files
@@ -21,7 +21,7 @@ y_test     = np.load(y_testpath)
 flatx_test = np.load(flatx_testpath)
 flaty_test = np.load(othery_testpath)
 otherx_test= np.load(otherx_testpath)
-cnnx_test  = np.reshape(flatx_test, (np.shape(flatx_test)[0], np.shape(flatx_test)[1], 1))
+cnnx_test  = np.reshape(flatx_test, (np.shape(flatx_test)[0], np.shape(flatx_test)[1], 1)) #seongjin park
 
 
 def ensemble(bilstm,svm,cnn,ffnn,x_test, flatx_test, y_test,
