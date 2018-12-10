@@ -1,6 +1,7 @@
 """
 Build a Bi-directional LSTM to train on the data.
-Input is assumed to be pre-processed.
+Input is assumed to be pre-processed
+Basic LSTM model code adapted from https://github.com/kochkinaelena/RumourEval2019
 """
 
 import numpy as np
@@ -126,7 +127,7 @@ def run_models_with_cv(xtrain,ytrain,splitspot,k=5, model_name='bilstm_stance.h5
         y_train = np.copy(ytrain[:])
         y_train = np.delete(y_train, np.arange(splitspot*i,splitspot*(i+1)),0)
         #call the model on training partitions
-        #adapted from objective_functions.py
+        #lines 131-160 adapted from kochkinaelena@github objective_functions.py
         y_pred, confidence = BiLSTM_model_stance(x_train,y_train,x_test,model_name,
                             num_lstm_units,num_lstm_layers,num_dense_layers,num_dense_units,
                             num_epochs,learn_rate,mb_size,l2reg)
@@ -164,6 +165,11 @@ def run_models_with_cv(xtrain,ytrain,splitspot,k=5, model_name='bilstm_stance.h5
 def run_bilstm(saved_info='answer',k=5,model_name='bilstm_stance.h5',
         num_lstm_units=100,num_lstm_layers=2, num_dense_layers=1, num_dense_units=200,
         num_epochs=50,learn_rate=1e-3,mb_size=64,l2reg=3e-4):
+    """
+    Use cross-validation to run a bidirectional LSTM
+    Write the output to a json file
+    saved_info: the name of the json file results will be saved to 
+    """
     x_train,y_train,_,_ = load_data()
     splitspot = prep_cv(x_train)
     answer = run_models_with_cv(x_train,y_train,splitspot,k,model_name,num_lstm_units,
