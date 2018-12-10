@@ -173,22 +173,21 @@ def run_bilstm(saved_info='answer',k=5,model_name='bilstm_stance.h5',
         json.dump(answer, f)
 
 def test_created_model(modelfile,ytest,mb_size=64):
-    model = load_model(modelfile)
-    testx = np.load(testxpath)
+    """
+    Test a model that has already been created
+    modelfile: the name of the saved model (.h5)
+    ytest: test gold labels
+    """
+    model = load_model(modelfile) #load the model
+    testx = np.load(testxpath) #load the test input data
+    #make predictions on the test set with the model
     pred_probabilities = model.predict(testx,mb_size)
     confidence = np.max(pred_probabilities, axis=2)
     y_pred = model.predict_classes(testx, mb_size)
     y_pred = y_pred.tolist()
-    with open('testpredshape.json','w') as tf:
-        json.dump(y_pred,tf)
-    y_pred = np.asarray(y_pred)
-
-    y_test = []
-    for i in range(len(ytest)):
-        y_test.append(to_categorical(ytest[i], num_classes=4))
-    y_test = np.asarray(y_test)
+    y_pred = np.asarray(y_pred) #save as numpy array
     ids_test = np.load(tweet_idspath)
-    #testing ways to get f1 accurately
+    #get f1 accurately
     better_preds = []
     better_testy = []
     all_ids      = []
@@ -200,6 +199,7 @@ def test_created_model(modelfile,ytest,mb_size=64):
                 better_testy.append(ytest[i][j])
             else:
                 continue
+    #get f1 scores and by-class f1
     mactest_F = f1_score(better_preds, better_testy, average='macro')
     mictest_F = f1_score(better_preds, better_testy, average='micro')
     print(classification_report(better_testy, better_preds, labels=None,
@@ -208,6 +208,7 @@ def test_created_model(modelfile,ytest,mb_size=64):
     print('macrof1: ', mactest_F)
     answerdict = {}
     output = answerdict
+    #save output of the test to json
     with open("test_output.json", 'w') as f:
         json.dump(output, f)
     return output
