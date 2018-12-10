@@ -1,6 +1,7 @@
 """
 Build a Bi-directional LSTM to train on the data.
-Input is assumed to be pre-processed.
+Input is assumed to be pre-processed
+Basic LSTM model code adapted from https://github.com/kochkinaelena/RumourEval2019
 """
 
 import numpy as np
@@ -126,7 +127,7 @@ def run_models_with_cv(xtrain,ytrain,splitspot,k=5, model_name='bilstm_stance.h5
         y_train = np.copy(ytrain[:])
         y_train = np.delete(y_train, np.arange(splitspot*i,splitspot*(i+1)),0)
         #call the model on training partitions
-        #adapted from objective_functions.py
+        #lines 131-160 adapted from kochkinaelena@github objective_functions.py
         y_pred, confidence = BiLSTM_model_stance(x_train,y_train,x_test,model_name,
                             num_lstm_units,num_lstm_layers,num_dense_layers,num_dense_units,
                             num_epochs,learn_rate,mb_size,l2reg)
@@ -164,6 +165,11 @@ def run_models_with_cv(xtrain,ytrain,splitspot,k=5, model_name='bilstm_stance.h5
 def run_bilstm(saved_info='answer',k=5,model_name='bilstm_stance.h5',
         num_lstm_units=100,num_lstm_layers=2, num_dense_layers=1, num_dense_units=200,
         num_epochs=50,learn_rate=1e-3,mb_size=64,l2reg=3e-4):
+    """
+    Use cross-validation to run a bidirectional LSTM
+    Write the output to a json file
+    saved_info: the name of the json file results will be saved to 
+    """
     x_train,y_train,_,_ = load_data()
     splitspot = prep_cv(x_train)
     answer = run_models_with_cv(x_train,y_train,splitspot,k,model_name,num_lstm_units,
@@ -173,22 +179,21 @@ def run_bilstm(saved_info='answer',k=5,model_name='bilstm_stance.h5',
         json.dump(answer, f)
 
 def test_created_model(modelfile,ytest,mb_size=64):
-    model = load_model(modelfile)
-    testx = np.load(testxpath)
+    """
+    Test a model that has already been created
+    modelfile: the name of the saved model (.h5)
+    ytest: test gold labels
+    """
+    model = load_model(modelfile) #load the model
+    testx = np.load(testxpath) #load the test input data
+    #make predictions on the test set with the model
     pred_probabilities = model.predict(testx,mb_size)
     confidence = np.max(pred_probabilities, axis=2)
     y_pred = model.predict_classes(testx, mb_size)
     y_pred = y_pred.tolist()
-    with open('testpredshape.json','w') as tf:
-        json.dump(y_pred,tf)
-    y_pred = np.asarray(y_pred)
-
-    y_test = []
-    for i in range(len(ytest)):
-        y_test.append(to_categorical(ytest[i], num_classes=4))
-    y_test = np.asarray(y_test)
+    y_pred = np.asarray(y_pred) #save as numpy array
     ids_test = np.load(tweet_idspath)
-    #testing ways to get f1 accurately
+    #get f1 accurately
     better_preds = []
     better_testy = []
     all_ids      = []
@@ -200,6 +205,7 @@ def test_created_model(modelfile,ytest,mb_size=64):
                 better_testy.append(ytest[i][j])
             else:
                 continue
+    #get f1 scores and by-class f1
     mactest_F = f1_score(better_preds, better_testy, average='macro')
     mictest_F = f1_score(better_preds, better_testy, average='micro')
     print(classification_report(better_testy, better_preds, labels=None,
@@ -208,6 +214,7 @@ def test_created_model(modelfile,ytest,mb_size=64):
     print('macrof1: ', mactest_F)
     answerdict = {}
     output = answerdict
+    #save output of the test to json
     with open("test_output.json", 'w') as f:
         json.dump(output, f)
     return output
